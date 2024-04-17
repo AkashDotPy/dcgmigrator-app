@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .container {
+                width: 100%;
+                margin: 0 auto;
+                padding : 10px;
+                box-sizing: border-box;
+            }
+            a {
+                color : #1A2B6D  ;
+                text-decoration: none;
+            }
+            a:hover {
+                color: rgb(15, 19, 229);
+            }
+            h1 {
+                font-family: Helvetica;
+                color: black;
+                font-size: 32px;
+                font-weight: bold;
+                text-align: center;
+            }
+            h2 {
+                font-family: Helvetica ;
+                color: black;
+                font-size: 26px;
+                font-weight: bold;
+            }
+            h3 {
+                font-family: Helvetica;
+                color: #1A2B6D;
+                font-size: 19px;
+                font-weight: bold;
+            }
+            h4 {
+                font-family: Calibri;
+                color: black;
+                font-size: 17px;
+            }
+            p {
+                font-family: Helvetica;
+                color: black;
+                font-size: 16px;
+
+            }
+            .content-section h3 {
+                font-family: Helvetica;
+                color: #1A2B6D;
+                font-size: 19px;
+                font-weight: bold;
+                margin: 05px 0; 
+                
+            }
+            table {
+                border-collapse: collapse;
+                font-family: Calibri;
+                font-size: 14px;
+                table-layout: auto;
+            }
+    
+            th, td {
+                border: 1px solid #DDDDDD;
+                text-align: left;
+                padding: 5px;
+            }
+            th {
+                font-family: Calibri;
+                font-weight: bold;
+                background-color: #9fc5e0;
+                color: #FFFFFF;
+                font-size: 16px;
+            }
+            td {
+                font-family: Calibri;
+                color: black;
+                font-size: 16px; 
+            }
+            tr:nth-child(even) {
+                background-color: #F2F2F2;
+            }
+            .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            padding-left: 1%;
+            box-sizing: border-box;
+            flex-wrap: wrap;
+            }
+            .charts {
+                margin-left: auto;
+                margin-right: auto;
+                flex: 1; 
+                width: auto;
+                max-width: 100%; 
+                overflow: hidden; 
+            }
+            .charts img {
+                width: 100%; 
+                height: auto; 
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+        </style>
+    </head>
+<body>
+     </h3>
+     <div class = "container">
+     <header>
+        <h1><u>DCGMigrator - Ora2pg Schema Validation Report -  {{schema.upper()}}</u></h1>
+    </header>
+    <br>
+    <h3>Click here --> <a href="ora2pg_count.html">View Ora2pg Table Data Validation Report</a>
+    </h3>
+    <h3>Click here --><a href="ora2pg_view.html">View Ora2pg View Data Validation Report</a></h3>
+    <h2>Ora2pg Consolidated Validation Reports</h2>
+    <div class="content-section">
+        <h3>Index</h3>
+        <ul>
+            {% for index, description in content_section.items() %}
+                <h3><li><a href="{{ description }}">{{ index }}</a></li></h3>
+            {% endfor %}
+            <h3><li><a href="#functional-difference">Procedural/Functional object difference</a></li></h3>
+        </ul>
+    </div>
+
+    <img src="./Ora2pgValidation_summary.png" alt = "bar chart">
+        <div class="table-container">
+        {% for index,result in summary.items()%}
+        <div id="{{ index }}">
+            <h3>{{description[index]}}</h3>
+        <table>
+        <thead>
+            <tr>
+                {% for column in result.columns %}
+                <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+            <tbody>
+            {% for _, row in result.iterrows() %}
+            <tr>
+                {% for _, value in row.items() %}
+                <td>{{ value }}</td>
+                {% endfor %}
+            {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+        <br>
+        </div>
+        {% endfor %}
+
+        {% for index,result in results.items()%}
+        <div id="{{ index }}">
+            <h3>{{description[index]}}</h3>
+        <table>
+            <thead>
+                <tr>
+                    {% for column in result.columns %}
+                    <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+                <tbody>
+                {% for _, row in result.iterrows() %}
+                <tr>
+                    {% for _, value in row.items() %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                {% endfor %}
+                </tr>
+                </tbody>
+        </table>
+        <br>
+        {% endfor %}
+        <div id = "functional-difference">
+        <table>
+            <thead>
+                <h3>Procedural/Functional object difference </h3>
+                {% if count %}
+                    <tr>
+                        {% set seen_keys = [] %}
+                        {% for key, value in count.items() %}
+                            {% for new_key, new_value in value.items() %}
+                                {% if new_key not in seen_keys %}
+                                    <th>{{ new_key }}</th>
+                                    {% set _ = seen_keys.append(new_key) %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+            </thead>
+                <tbody>
+                    {% for key, value in count.items() %}
+                        <tr>
+                        {% for new_key, new_value in value.items() %}
+                            <td>{{ new_value }}</td>
+                        {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                {% else %}
+                    <p>There are no object differences</p>
+                {% endif %}
+        </table>
+        </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>
+

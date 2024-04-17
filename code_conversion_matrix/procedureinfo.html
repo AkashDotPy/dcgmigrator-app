@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        a {
+            color: #1A2B6D;
+        }
+        a:hover {
+            color: rgb(15, 19, 229);
+        }
+        h1 {
+            font-family: Helvetica;
+            color: black;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+        }
+        h2 {
+            font-family: Helvetica;
+            color: black;
+            font-size: 26px;
+        }
+        h3 {
+            font-family: Helvetica;
+            color: #1A2B6D;
+            font-size: 14px;
+        }
+        h4 {
+            font-family: Calibri;
+            color: black;
+            font-size: 17px;
+        }
+        p {
+            font-family: Helvetica;
+            color: black;
+            font-size: 26px;
+        }
+        table {
+            border-collapse: collapse;
+            font-family: Calibri;
+            font-size: 14px;
+            table-layout: auto;
+        }
+
+        th, td {
+            border: 1px solid #DDDDDD;
+            text-align: left;
+            padding: 5px;
+        }
+        th {
+            font-family: Calibri;
+            font-weight: bold;
+            background-color: #9fc5e0;
+            color: #FFFFFF;
+            font-size: 16px;
+        }
+        td {
+            font-family: Calibri;
+            color: black;
+            font-size: 16px;
+        }
+        tr:nth-child(even) {
+            background-color: #F2F2F2;
+        }
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-left: 1%;
+            box-sizing: border-box;
+            flex-wrap: wrap;
+        }
+        .charts {
+            margin-left: auto;
+            margin-right: auto;
+            flex: 1;
+            width: auto;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .charts img {
+            width: 100%; /* Adjust width as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .bold-text {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <a href="summary.html">
+        <button>home</button>
+    </a>
+    <div class="container">
+        <header>
+            <h1></u>Schema {{schema}} Procedural code information</u></h1>
+        </header>
+
+        <div class="chart-container">
+            <div class="charts">
+                <img src="../images/reference_pie_chart.png" alt="chart1" />
+            </div>
+            <div class="charts">
+                <img src="../images/referenced_name_pie_chart.png" alt="chart2" />
+            </div>
+        </div>
+        
+        <div class="table-container">
+            {% for index,result in results.items() %}
+            <h2>{{ description[index] }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in result.columns %}
+                        <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for _, row in result.iterrows() %}
+                    <tr>
+                        {% for _, value in row.items() %}
+                        <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

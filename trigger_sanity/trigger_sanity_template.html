@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding : 10px;
+        }
+        a {
+            color : #1A2B6D  ;
+        }
+        a:hover {
+            color: rgb(15, 19, 229);
+        }
+        h1 {
+            font-family: Helvetica;
+            color: black;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+        }
+        h2 {
+            font-family: Helvetica ;
+            color: black;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        h3 {
+            font-family: Helvetica;
+            color: #1A2B6D;
+            font-size: 14px;
+        }
+        h4 {
+            font-family: Calibri;
+            color: black;
+            font-size: 17px;
+        }
+        .query-subheader, p.content-text {
+            color: #1A2B6D;
+            font-size: 21px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+        table {
+            border-collapse: collapse;
+            font-family: Calibri;
+            font-size: 14px;
+            table-layout: auto;
+        }
+        .charts {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        th, td {
+            border: 1px solid #DDDDDD;
+            text-align: left;
+            padding: 5px;
+        }
+        th {
+            font-family: Calibri;
+            font-weight: bold;
+            background-color: #9fc5e0;
+            color: #FFFFFF;
+            font-size: 16px;
+        }
+        td {
+            font-family: Calibri;
+            color: black;
+            font-size: 16px; 
+        }
+        tr:nth-child(even) {
+            background-color: #F2F2F2;
+        }
+    </style>
+</head>
+<body>
+    <h1><u>Execution Report for {{pg_schema.upper()}} Trigger Sanity</u></h1>
+    <br>
+    <h2>Summary of overall mock test on Triggers migrated from Oracle</h2>
+    <br>
+    <img src="./trigger_summary.png" alt="Summary Pie Chart" style="width: 100%; max-width: 600px; height: auto;">
+    <hr>
+    <h2>Summary of overall exception on triggers sanity</h2>
+    <table>
+        <tr>
+            <th>Table_schema</th>
+            <th>Table_name</th>
+            <th>Trigger_schema</th>
+            <th>Trigger_name</th>
+            <th>Event_manipulation</th>
+            <th>Activation</th>
+            <th>Status</th>
+        </tr>
+        {% for key, result_dict in execution_results.items() %}
+            <tr>
+                <td>{{ result_dict['table_schema'] }}</td>
+                <td>{{ result_dict['table_name'] }}</td>
+                <td>{{ result_dict['trigger_schema'] }}</td>
+                <td>{{ result_dict['trigger_name'] }}</td>
+                <td>{{ result_dict['event_manipulation'] }}</td>
+                <td>{{ result_dict['activation'] }}</td>
+                <td>{{ result_dict['status'] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr>
+    <h4>Error Descriptions</h4>
+    <ul>
+        {% for key, result_dict in execution_results.items() %}
+            {% if result_dict['Error_reason'] %}
+                <li>
+                    <strong>{{ key }}:</strong> <br>{{ result_dict['Error_reason'] }}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</body>
+</html>

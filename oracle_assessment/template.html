@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- <title>Data Comparison Report</title> -->
+
+    <style>
+        /* body {
+            font-family: Arial, sans-serif;
+            margin: 100px;
+            background-color: #F2F2F2;
+        } */
+        .container {
+            width: 100%;
+            /* max-width: 1100px;   */
+            margin: 0 auto;
+            padding : 10px;
+        }
+        a {
+            color : #1A2B6D  ;
+        }
+        a:hover {
+            color: rgb(15, 19, 229);
+        }
+        h1 {
+            font-family: Helvetica;
+            color: black;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+        }
+        h2 {
+            font-family: Helvetica ;
+            color: black;
+            font-size: 26px;
+            font-weight: bold;
+            /* margin: 20px 0 10px; */
+        }
+        h3 {
+            font-family: Helvetica;
+            color: #1A2B6D;
+            font-size: 14px;
+            /* margin-top: 20px; */
+        }
+        h4 {
+            font-family: Calibri;
+            color: black;
+            font-size: 17px;
+            /*font-weight: bold;
+            margin-top: 20px;    */
+        }
+        .query-subheader, p.content-text {
+            color: #1A2B6D;
+            font-size: 21px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+        table {
+            border-collapse: collapse;
+            /* width: 100%; */
+            font-family: Calibri;
+            font-size: 14px;
+            table-layout: auto;
+        }
+        .charts {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        th, td {
+            border: 1px solid #DDDDDD;
+            text-align: left;
+            padding: 5px;
+        }
+        th {
+            font-family: Calibri;
+            font-weight: bold;
+            background-color: #9fc5e0;
+            color: #FFFFFF;
+            font-size: 16px;
+        }
+        td {
+            font-family: Calibri;
+            /* background-color: #316ffd; */
+            color: black;
+            font-size: 16px; 
+        }
+        tr:nth-child(even) {
+            background-color: #F2F2F2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><u>Oracle Assessment Report</u></h1>
+        </header> 
+      <br>
+        <!-- Loop through datasets -->
+        {% for index, data in data.items() %}
+        <hr>
+        <h2>{{ title[index] }}</h2>
+        <h3>{{ descriptions[index] }}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in data.columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>         
+                </thead>
+                <tbody>
+                    {% for _, row in data.iterrows() %}
+                        <tr>
+                            {% for _, value in row.items() %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>  
+            </table>
+           
+        {% endfor %}
+    </div>
+</body>
+</html>

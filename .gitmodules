@@ -1,0 +1,3 @@
+[submodule "dcgmigrator"]
+	path = dcgmigrator
+	url = https://github.com/dcgadmin/dcgmigrator.git

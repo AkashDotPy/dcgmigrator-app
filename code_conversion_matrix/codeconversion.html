@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        a {
+            color: #1A2B6D;
+        }
+        a:hover {
+            color: rgb(15, 19, 229);
+        }
+        h1 {
+            font-family: Helvetica;
+            color: black;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+        }
+        h2 {
+            font-family: Helvetica;
+            color: black;
+            font-size: 26px;
+        }
+        h3 {
+            font-family: Helvetica;
+            color: #1A2B6D;
+            font-size: 14px;
+        }
+        h4 {
+            font-family: Calibri;
+            color: black;
+            font-size: 17px;
+        }
+        p {
+            font-family: Helvetica;
+            color: black;
+            font-size: 26px;
+        }
+        table {
+            border-collapse: collapse;
+            font-family: Calibri;
+            font-size: 14px;
+            table-layout: auto;
+        }
+
+        th, td {
+            border: 1px solid #DDDDDD;
+            text-align: left;
+            padding: 5px;
+        }
+        th {
+            font-family: Calibri;
+            font-weight: bold;
+            background-color: #9fc5e0;
+            color: #FFFFFF;
+            font-size: 16px;
+        }
+        td {
+            font-family: Calibri;
+            color: black;
+            font-size: 16px;
+        }
+        tr:nth-child(even) {
+            background-color: #F2F2F2;
+        }
+        .chart-galllery{
+            overflow: auto;
+            white-space: nowrap;
+            padding: 10px;
+            max-height: 500px;
+        }
+        .chart-wrapper {
+            margin-bottom: 20px;
+        }
+        .chart-wrapper img {
+            padding: 10px;
+        }
+        /* @media screen and (max-width: 800px) {
+          .chart-galllery {
+            -ms-flex: 50%;
+            flex: 50%;
+            max-width: 50%;
+          }
+        } */
+
+
+        @media screen and (max-width: 500px) {
+          .chart-galllery {
+            -ms-flex: 100%;
+            flex: 100%;
+            max-width: 100%;
+          }
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .bold-text {
+            font-weight: bold;
+        }
+        .scrollbar-table{
+            display: block;
+            height: 500px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <a href="summary.html">
+        <button>home</button>
+    </a>
+    <div class="container">
+        <header>
+            <h1><u>DCGMigrator - Schema {{schema}} Code Conversion Planning information</u></h1>
+        </header>
+
+        <div class="chart-galllery">
+            <div class="chart-wrapper">
+                <img src="../images/loc_by_object_type.png" alt="chart1" width="80%"/>
+            </div>
+            <div class="chart-wrapper">
+                <img src="../images/WEEK_by_object_type.png" alt="chart2" width="80%"/>
+            </div>
+            <div class="chart-wrapper">
+                <img src="../images/WEEK_by_object_type_line.png" alt="chart2" width="80%"/>
+            </div>
+        </div>
+
+        <div class="table-container">
+            {% for index,result in results.items() %}
+            <h3>{{ description[index] }}</h3>
+            <div class="scrollbar-table">
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in result.columns %}
+                        <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for _, row in result.iterrows() %}
+                    <tr>
+                        {% for _, value in row.items() %}
+                        <td>{{ value }}</td>
+                        {% endfor %}
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

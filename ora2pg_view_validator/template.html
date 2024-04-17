@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .container {
+                width: 100%;
+                margin: 0 auto;
+                padding : 10px;
+                box-sizing: border-box;
+            }
+            a {
+                color : #1A2B6D  ;
+                text-decoration: none;
+            }
+            a:hover {
+                color: rgb(15, 19, 229);
+            }
+            h1 {
+                font-family: Helvetica;
+                color: black;
+                font-size: 32px;
+                font-weight: bold;
+                text-align: center;
+            }
+            h2 {
+                font-family: Helvetica ;
+                color: black;
+                font-size: 26px;
+                font-weight: bold;
+            }
+            h3 {
+                font-family: Helvetica;
+                color: #1A2B6D;
+                font-size: 19px;
+                font-weight: bold;
+            }
+            h4 {
+                font-family: Calibri;
+                color: black;
+                font-size: 17px;
+            }
+            p {
+                font-family: Helvetica;
+                color: black;
+                font-size: 16px;
+
+            }
+            .content-section h3 {
+                font-family: Helvetica;
+                color: #1A2B6D;
+                font-size: 19px;
+                font-weight: bold;
+                margin: 05px 0; 
+                
+            }
+            table {
+                border-collapse: collapse;
+                font-family: Calibri;
+                font-size: 14px;
+                table-layout: auto;
+            }
+    
+            th, td {
+                border: 1px solid #DDDDDD;
+                text-align: left;
+                padding: 5px;
+            }
+            th {
+                font-family: Calibri;
+                font-weight: bold;
+                background-color: #9fc5e0;
+                color: #FFFFFF;
+                font-size: 16px;
+            }
+            td {
+                font-family: Calibri;
+                color: black;
+                font-size: 16px; 
+            }
+            tr:nth-child(even) {
+                background-color: #F2F2F2;
+            }
+            .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; 
+            padding-left: 1%;
+            box-sizing: border-box;
+            flex-wrap: wrap;
+            }
+            .charts {
+                margin-left: auto;
+                margin-right: auto;
+                flex: 1; 
+                width: auto;
+                max-width: 100%; 
+                overflow: hidden; 
+            }
+            .charts img {
+                width: 100%; 
+                height: auto; 
+            }
+            .table-container {
+                overflow-x: auto;
+            }
+            .back_link {
+                text-align: right;
+            }
+        </style>
+    </head>
+<body>
+     </h3>
+     <div class = "container">
+     <header>
+        <h1><u>DCGMigrator - Ora2pg View Count Validation Report - {{schema.upper()}}</u></h1>
+    </header>
+    <div class="back_link">
+        <a href="Ora2pgValidation_{{schema}}.html">
+            <h3><< Back</h3>
+        </a>
+        </div>
+    <h2>Ora2pg view validation summary</h2>
+    <img src="./view_status.png" alt="summary chart">
+    <table>
+        <thead>
+            <tr>
+                {% for col in merged_df.columns %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for _, row in merged_df.iterrows() %}
+                <tr>
+                    {% for col in merged_df.columns %}
+                        <td>{{ row[col] }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+</body>
+</html>
+

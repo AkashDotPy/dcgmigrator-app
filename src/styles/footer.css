@@ -1,0 +1,33 @@
+.footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #046169;
+    padding: 15px 7%;
+    position: fixed; 
+    bottom: 0; 
+}
+
+.footer ul {
+    flex: 1;
+    list-style: none;
+    text-align: center;
+}
+
+.footer h3, .footer a {
+    color: white;
+}
+
+.footer ul li {
+    display: inline-block;
+    margin: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.footer a {
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 14px;
+}
