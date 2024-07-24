@@ -368,7 +368,7 @@ class SqliteDatabaseManagement:
                 if result is not None and len(result) >0:
                     df = pd.DataFrame(result, columns= [column[0] for column in self.cursor.description])
                     if len(df.index)!=0:
-                        print(df)
+                        print(type(df))
                         return df       
                 else:
                     self.logger.error(f"Migration project {project_name} does not exists")

@@ -24,7 +24,7 @@ class DcgWrapper:
         
     def create_source_wrapper(self, project_name,ora_home,ora_host,ora_service_name,ora_port,ora_user,ora_pwd,ora_schema):
         self.config_instance.default_config(project_name)
-        self.config_instance.oracle_cred(project_name,ora_home,ora_host,ora_service_name,ora_port,ora_user,ora_pwd,ora_schema)
+        self.config_instance.local_oracle_cred(project_name,ora_home,ora_host,ora_service_name,ora_port,ora_user,ora_pwd,ora_schema)
         return {"Status" : "Source is created"}
     
     def create_target_wrapper(self, project_name,pg_dbname,pg_host,pg_port,pg_user,pg_password,input_pg_version):
@@ -33,12 +33,18 @@ class DcgWrapper:
         return {"Status" : "Target is created"}
     
     def show_project_wrapper(self,project_name):
-        print(project_name)
         df = self.sqlite_inst.fetch_project(project_name)
         # print(self.sqlite_inst.fetch_project(project_name))
-        data = df.to_json(orient='records') 
-        new_df = json.loads(data)
-        return new_df
+        # data = df.to_json(orient='records') 
+        # new_df = json.loads(data)
+        return df
+    
+    def show_projectname_wrapper(self,project_name):
+        df = self.sqlite_inst.fetch_project(project_name)
+        # if len(df.index) != 0
+        projectname = df["project_name"]
+        projectname = list(projectname)
+        return projectname
     
     def show_config_wrapper(self,project_name):
         result = self.sqlite_inst.show_config_jsonarray(project_name)

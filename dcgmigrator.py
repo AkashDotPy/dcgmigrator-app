@@ -1,3 +1,4 @@
+#Test submodule changes to be updated
 import argparse,sys
 from database_operation.sqlite import SqliteDatabaseManagement
 from dcgmigrator_config.config import ConfigInputs
@@ -19,7 +20,9 @@ from dcgmigrator_core.master_cmd import MasterCommand
 from dcgmigrator_core.migrator_validation import MigratorValidation
 from oracle_assessment.assessment import OracleAssessment
 from code_conversion_matrix.matrix import CodeConversionPlanning 
+from dcgmigrator_core.data_transfer import DataTransfer
 import os
+import time
 
 # define Python user-defined exceptions
 class InvalidProjNameException(Exception):
@@ -28,12 +31,13 @@ class InvalidProjNameException(Exception):
 
 
 class ArgumentManagement:
+
     def arguments():
         parser = argparse.ArgumentParser()
         subparsers = parser.add_subparsers(dest="main_command", title="Main Commands")
 
         # Commands for create-project, create-source, create-target, and show-config
-        project_parser = subparsers.add_parser("dcgmigrator", help="Project-related commands")
+        project_parser = subparsers.add_parser("dcgmigrator", help="AI-powered CLI solution for seamless end-to-end migration to Open Source database")
         project_subparsers = project_parser.add_subparsers(dest="subcommand", title="Subcommands")
 
         parser_create_project = project_subparsers.add_parser("create-project", help="Create a new Oracle to PostreSQL Migration project")
@@ -51,17 +55,17 @@ class ArgumentManagement:
         #parser_create_project.add_argument("--project_name", required=False, help="Mentioned the name of the project")
         #parser_create_project.add_argument("--retain_files", required=True,Type=Bool, Default=True, help="control whether project related files need to be deleted.")
 
-        parser_create_source = project_subparsers.add_parser("create-source", help="Add Oracle source details")
+        parser_create_source = project_subparsers.add_parser("create-source", help="Add Oracle source details\nprovide oracle source connection details tns alias or (host, port, service name)")
         parser_create_source.add_argument("--project_name", required=False, help="Project name under which source need to be added")
         parser_create_source.add_argument("--ora_user", required=True, help="Specify Oracle user for connection, report execution, and data migration")
         parser_create_source.add_argument("--ora_pwd", required=True, help="Provide Oracle user password")
-        parser_create_source.add_argument("--ora_host", required=True, help="Oracle instance hostname or IP address")
-        parser_create_source.add_argument("--ora_service_name", required=True, help="Oracle SID or service name")
-        parser_create_source.add_argument("--ora_port", required=True, help="Oracle port number")
+        parser_create_source.add_argument("--ora_host", required=False, help="Oracle instance hostname or IP address")
+        parser_create_source.add_argument("--ora_service_name", required=False, help="Oracle SID or service name")
+        parser_create_source.add_argument("--ora_port", required=False, help="Oracle port number")
+        parser_create_source.add_argument("--tns_connection", required=False, help="Specify TNS connection.")
         parser_create_source.add_argument("--ora_home", required=False, help="Oracle Home path; by default, it will use the value of the ORACLE_HOME environment variable")
         parser_create_source.add_argument("--ora_schema", required=True, help="Specify Oracle schema to be migrated.")
-
-
+        
         parser_create_target = project_subparsers.add_parser("create-target", help="Add PostgreSQL DB Target details")
         parser_create_target.add_argument("--project_name", required=False, help="Migration Project name")
         parser_create_target.add_argument("--pg_dbname", required=True, help="PostgreSQL database name")
@@ -71,13 +75,14 @@ class ArgumentManagement:
         parser_create_target.add_argument("--pg_password", required=True, help="PostgreSQL master user name password")
         parser_create_target.add_argument("--pg_version", required=True, default="16",  help="Target PostgreSQL Version, Default is 16")
 
+
         # Commands for show config details
         parser_show_config = project_subparsers.add_parser("show-config", help="Show Ora2pg config stored")
         parser_show_config.add_argument("--project_name", required=False, help="Project Name to view the configuration")
         
         # Commands to generate config details in ora2pg files.
-        parser_show_config = project_subparsers.add_parser("generate-config", help="Generate Ora2pg config information without for local testing")
-        parser_show_config.add_argument("--project_name", required=True, help="Project Name to view the configuration")
+        parser_show_config = project_subparsers.add_parser("generate-config", help="Generate Ora2pg config information without credentials for local testing")
+        parser_show_config.add_argument("--project_name", required=False, help="Project Name to view the configuration")
 
         # Command for project list
         parser_list_project = project_subparsers.add_parser("list-project", help="List all existing project in DCGMigrator")
@@ -104,12 +109,15 @@ class ArgumentManagement:
         parser_ora_assess.add_argument("--project_name", required=False, help="Insert the name of the project")
 
         # Command for Oracle data type mapping
-        parser_ora_assess = project_subparsers.add_parser("datatypemapping", help="Run data type mapping based on sampling for optimal type in PostgreSQL")
-        parser_ora_assess.add_argument("--project_name", required=False, help="Insert the name of the project")
+        parser_data_type = project_subparsers.add_parser("datatypemapping", help="Run data type mapping based on sampling for optimal type in PostgreSQL")
+        parser_data_type.add_argument("--project_name", required=False, help="Insert the name of the project")
+        parser_data_type.add_argument("--run_only_constraint",action="store_true", required=False, help="Control running data type mapping only for constraint columns")
+        parser_data_type.add_argument("--oracle_only_top_n_table", default=10000, required=False, help="Fix no.of Top Tabl as size to run")
+
 
         # Commands for converting table
         parser_convert = project_subparsers.add_parser("convert", help="Perform Conversion of Oracle schema and procedural code")
-        parser_convert.add_argument("--type", required=False, help="If specify, will convert only specific Object Type as supported by Ora2pg tool")
+        parser_convert.add_argument("--type", required=False, help="If specify, will convert only specific Database Object Type")
         parser_convert.add_argument("--project_name", required=False, help="Insert the name of the project")
         parser_convert.add_argument("--rundatatypemapping",action="store_true", required=False , help="Control running data type mapping as part of conversion")
 
@@ -123,6 +131,7 @@ class ArgumentManagement:
         # copy data
         parser_copy = project_subparsers.add_parser("copy", help="Migrate data from Oracle to PostgreSQL")
         parser_copy.add_argument("--project_name", required=False, help="Insert the name of the project")
+        parser_copy.add_argument("--multiprocess", action="store_true", required=False, help="multiprocess data transfer")
         parser_copy.add_argument("--use_oracle_fdw", required=False, default=False, help="perfom faster data load using Oracle FDW configured in PostgreSQL")
         parser_copy.add_argument("--continue_on_error", required=False, default=True, help="Continue data load even in case of some failures")
         parser_copy.add_argument("--data_limit", required=False, type=int, help="Limit no.of of rows to migrate, can be use for initial testing")
@@ -131,6 +140,7 @@ class ArgumentManagement:
         # Test data
         parser_test = project_subparsers.add_parser("validate", help="Validate migration for schema, code, and data. Utilize the DCG_REPORT_PATH environment variable to override the default path for the migration report output.")
         parser_test.add_argument("--type", required=False, help='mention validation type, it can be specified as (schema,code(sanity),trigger(sanity),\n ora2pg_validate(run all schema , Data) , ora2pg_schema ,ora2pg_count ,ora2pg_view_count')
+        parser_test.add_argument("--validation_error", required=False,type=int,default=10, help='mention validation type, it can be specified as (schema,code(sanity),trigger(sanity),\n ora2pg_validate(run all schema , Data) , ora2pg_schema ,ora2pg_count ,ora2pg_view_count')
         parser_test.add_argument("--schemalist", required=False, help='Mentioned list of schema comma separared to run Code Sanity, added it for Oracle Packages converted as schema in PostgreSQL')
         parser_test.add_argument("--status", required=False, default="Fail", help="Applicable for Ora2pg schema\count\view validation with status as : (Pass\Fail\Both)")
         parser_test.add_argument("--project_name", required=False, help="Migration project name")
@@ -157,7 +167,7 @@ class ArgumentManagement:
                     else:
                         project_name = os.environ.get('PROJECT_NAME')
                 except InvalidProjNameException:
-                    print("Missing Project_Name either in Env Setting or command line argument")
+                    print("Missing project_name either in Env Setting($PROJECT_NAME) or command line(--project_name) argument")
                     sys.exit(-1)
             else:
                 project_name = args.project_name
@@ -185,7 +195,7 @@ class ArgumentManagement:
         assess_inst = OracleAssessment(project_name)
         code_conv_inst = CodeConversionPlanning(project_name)
         pg_inst = PostgresDatabase(project_name)
-
+        data_transfer_inst = DataTransfer(project_name)
         if args.main_command == "dcgmigrator":
             if args.subcommand == "create-project":
                 if sqlite_instance.create_project(project_name, args.source, args.target):
@@ -211,12 +221,22 @@ class ArgumentManagement:
 
             if args.subcommand == "create-source":
                 if sqlite_instance.validate_project(project_name) and cmd_flow_inst.command_manager(args.subcommand,project_name):
-                    if config_instance.oracle_cred(project_name,args.ora_home,args.ora_host,args.ora_service_name,args.ora_port,args.ora_user,args.ora_pwd,args.ora_schema):
-                        status_inst.update_status(args.subcommand,project_name)
-                        print(f"Oracle Source added successfully for Project - {project_name}")
+                    if args.tns_connection:
+                        if config_instance.oracle_cred(project_name,args.ora_home,args.ora_user,args.ora_pwd,args.tns_connection,args.ora_schema):
+                            status_inst.update_status(args.subcommand,project_name)
+                            print(f"Oracle Source added successfully for Project - {project_name}")
+                        else:
+                            print(f"Oracle Source addition failed for Project - {project_name}")
+
+                    elif args.ora_host and args.ora_service_name and args.ora_port:
+                        if config_instance.local_oracle_cred(project_name,args.ora_home,args.ora_host,args.ora_service_name,args.ora_port,args.ora_user,args.ora_pwd,args.ora_schema):
+                            status_inst.update_status(args.subcommand,project_name)
+                            print(f"Oracle Source added successfully for Project - {project_name}")
+                        else:
+                            print(f"Oracle Source addition failed for Project - {project_name}")
                     else:
-                        print(f"Oracle Source addition failed for Project - {project_name}")
-                    
+                        print("Please provide oracle source connection details tns alias or (host, port, service name)")
+  
                 else:
                     logger.error(f"Project name - {project_name} is not created, please use create-project option first")
                     
@@ -286,7 +306,7 @@ class ArgumentManagement:
 
             if args.subcommand == "datatypemapping":
                 if sqlite_instance.validate_project(project_name):
-                    if plus_instance.modify_type(project_name):
+                    if plus_instance.modify_type(project_name,args.run_only_constraint, args.oracle_only_top_n_table):
                         logger.info(f"Data type mapping completed for Project - {project_name}")
                     else:
                         logger.error(f"Data type failed for Project - {project_name}")
@@ -311,39 +331,44 @@ class ArgumentManagement:
 
             if args.subcommand == "copy":
                 # if cmd_flow_inst.command_manager(args.subcommand,project_name):
-                    if cmd.copy_data_movement(project_name,args.use_oracle_fdw, args.continue_on_error, args.data_limit):
-                        status_inst.update_status(args.subcommand,project_name)
-                
+                    start = time.time()
+                    if args.multiprocess:
+                        if data_transfer_inst.multiprocess_copy(project_name,args.use_oracle_fdw, args.continue_on_error, args.data_limit):
+                            status_inst.update_status(args.subcommand,project_name)
+                    else:
+                        if cmd.copy_data_movement(project_name,args.use_oracle_fdw, args.continue_on_error, args.data_limit):
+                            status_inst.update_status(args.subcommand,project_name)
+                    end = time.time()
+                    time_taken = end - start
+                    print(f"Total Time for Data Migration was {time_taken : .2f} seconds")
+
             if args.subcommand == "validate":
                 if sqlite_instance.validate_project(project_name):
                     if not args.schemalist:
-                        val_inst.test_migrator(args.type,args.status)
+                        val_inst.test_migrator(args.type,args.validation_error,args.status)
                         status_inst.update_status(args.subcommand,project_name)
                     else:
-                        val_inst.test_migrator(args.type, args.schemalist, args.status)
+                        val_inst.test_migrator(args.type,args.validation_error, args.status,args.schemalist)
                         status_inst.update_status(args.subcommand,project_name)
                 else:
                     logger.error(f"Project name - {project_name} is not created, please use create-project option first")
-
 
 
             if args.subcommand =="migrate":
                  ms_cmd_inst.master_cmd(project_name)
 
             if args.subcommand == "source-metadata":
-                if args.t == "show-table":
+                if args.type == "show-table":
                     cmd.show_table(project_name)
 
-                if args.t == "show-column":
+                if args.type == "show-column":
                     cmd.show_column(project_name)
 
-                if args.t == "show-version":
+                if args.type == "show-version":
                     cmd.show_version(project_name)
 
-                if args.t == "show-schema":
+                if args.type == "show-schema":
                     cmd.show_schema(project_name)
-
-            
                      
             
                 

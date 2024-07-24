@@ -3,6 +3,7 @@ import os
 
 def copy_contents(source_dir, destination_dir):
     for item in os.listdir(source_dir):
+        print(item)
         source_path = os.path.join(source_dir, item)
         destination_path = os.path.join(destination_dir, item)
         

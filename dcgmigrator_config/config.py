@@ -48,8 +48,7 @@ class ConfigInputs:
                                     {"project_name": f"{project_name}", "key":"STOP_ON_ERROR"         , "value":"0"},
                                     {"project_name": f"{project_name}", "key":"CREATE_OR_REPLACE"     , "value":"1"},
                                     {"project_name": f"{project_name}", "key":"PG_INTEGER_TYPE"       , "value":"1"},
-                                    {"project_name": f"{project_name}", "key":"PG_NUMERIC_TYPE"       , "value":"0"},
-                                    {"project_name": f"{project_name}", "key":"DEFAULT_NUMERIC"       , "value":"double precision"},
+                                    {"project_name": f"{project_name}", "key":"DEFAULT_NUMERIC"       , "value":"numeric"},
                                     {"project_name": f"{project_name}", "key":"VARCHAR_TO_TEXT"       , "value":"1"},
                                     {"project_name": f"{project_name}", "key":"FORCE_IDENTITY_BIGINT" , "value":"1"},
                                     {"project_name": f"{project_name}", "key":"DATA_EXPORT_ORDER"     , "value":"size"},
@@ -67,7 +66,7 @@ class ConfigInputs:
         else:
             return oracle_home
     
-    def oracle_cred(self,project_name,oracle_home,ora_host,ora_service_name,ora_port,ora_user,ora_pwd,ora_schema):
+    def local_oracle_cred(self,project_name,oracle_home,ora_host,ora_service_name,ora_port,ora_user,ora_pwd,ora_schema):
         oracle_home = self.insert_ora_home()
         ora_config_content = (
                                 {"project_name": f"{project_name}","key":"ORACLE_HOME"   , "value":f"{oracle_home}"},
@@ -79,6 +78,21 @@ class ConfigInputs:
                                 {"project_name": f"{project_name}","key":"SCHEMA"        , "value":f"{ora_schema}"}
         )
         return self.insert_ora2pgconfigs(project_name,ora_config_content)
+    
+    def oracle_cred(self,project_name,oracle_home,ora_user,ora_pwd,tns,ora_schema):
+        oracle_home = self.insert_ora_home()
+        ora_config_content = (
+                                {"project_name": f"{project_name}","key":"ORACLE_HOME"   , "value":f"{oracle_home}"},
+                                {"project_name": f"{project_name}","key":"ORACLE_DSN"    , "value":f"dbi:Oracle:{tns}"},
+                                {"project_name": f"{project_name}","key":"ORACLE_USER"   , "value":f"{ora_user}"},
+                                {"project_name": f"{project_name}","key":"ORACLE_PWD"    , "value":f"{ora_pwd}"},
+                                {"project_name": f"{project_name}","key":"ORA_SCHEMA"    , "value":f"{ora_schema}"},
+                                {"project_name": f"{project_name}","key":"PG_SCHEMA"     , "value":f"{ora_schema.lower()}"},       
+                                {"project_name": f"{project_name}","key":"SCHEMA"        , "value":f"{ora_schema}"}
+        )
+        return self.insert_ora2pgconfigs(project_name,ora_config_content)
+    
+
 
     def pg_cred(self,project_name,pg_dbname,pg_host,pg_port,pg_user,pg_password,input_pg_version):
         # if input_pg_version == None: 
